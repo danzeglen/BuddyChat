@@ -1,6 +1,6 @@
 const users = []
 
-const addUser = (id, name, room) => {
+const addUser = (name, room) => {
     const existingUser = users.find(user => user.name.trim().toLowerCase() === name.trim().toLowerCase())
 
     if(existingUser) return {error: "username has already been taken"}
@@ -8,7 +8,7 @@ const addUser = (id, name, room) => {
     if(!name) return {error: "username is required"}
     if(!room) return {error: "room is required"}
 
-    const user = {id, name, room}
+    const user = {name, room}
     users.push(user)
 
     return {user}

@@ -11,6 +11,18 @@ const server = http.createServer(app)
 
 let userlist = [];
 
+const pushUser = (user) => {
+    let obj = userlist.find(x => x.username === user.username)
+    console.log(obj)
+    console.log('^^^^^')
+    if(typeof obj === 'undefined'){
+        userlist.push(user)
+    } else {
+        let index = userlist.indexOf(obj);
+        userlist[index] = obj
+    }
+}
+
 const io = socketIo(server, {
     cors: {
         origin: '*',
@@ -18,31 +30,22 @@ const io = socketIo(server, {
     }
 });
 
-
 app.get("/",(req,res) => {
     res.send('hello')
 })
 
 io.on("connection", socket => {
 
-    socket.on('login',({name, room}, callback) => {
-        const { user, error } = addUser(socket.id, name, room)
-        if(error) return callback(error)
-
-        socket.join(user.room)
-        socket.in(room).emit('notification', { title: 'Someone\'s here', description: `${user.name} just entered the room` })
-        io.in(room).emit('users', getUsers(room))
-        callback()
-
-    })
 
     socket.on('join_room', ({username,room}, callback) => {
         let id = socket.id
         const user = {username, room, id}
-        userlist.push(user)
+        pushUser(user)
         console.log('joining room')
         socket.join(room)
         io.in(room).emit('new_room', `Thank you for joining ${room}`)
+        console.log(userlist)
+        socket.emit('all_users', (userlist))
     })
 
 
@@ -60,6 +63,16 @@ io.on("connection", socket => {
         socket.emit('selfmessage', {message,room,username})
     
     })
+
+    socket.on('disconnect', () => {
+        console.log('DISCONNECTED USER')
+        let dis_user = userlist.find(x => x.id === socket.id)
+        let index = userlist.indexOf(dis_user)
+        console.log(index)
+        userlist.splice(index,1);
+        console.log(userlist)
+        console.log(dis_user)
+    });
 
 })
 
