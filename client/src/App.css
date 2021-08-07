@@ -1,0 +1,11 @@
+body{
+    background-color: 'lightblue';
+    background-image: url('./wa.svg');
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+html, body {
+    height: 100%;
+    margin: 0px;
+}
